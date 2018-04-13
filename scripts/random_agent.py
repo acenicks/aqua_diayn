@@ -3,10 +3,21 @@
 import rospy
 import numpy as np
 from ros_plant import ROSPlant
+from aquacore.srv import SetGait
+
+def set_gait_flex_sine():
+    rospy.wait_for_service('/aqua/set_gait')
+    try:
+        resp = rospy.ServiceProxy('/aqua/set_gait', SetGait)
+        resp('flexible-sine')
+        return resp
+    except rospy.ServiceException, e:
+        print "Service call failed: %s"%e
 
 if __name__ == '__main__':
 
     rospy.init_node('random_agent', anonymous=True)
+    set_gait_flex_sine()
 
     env = ROSPlant()
     env.reset()
