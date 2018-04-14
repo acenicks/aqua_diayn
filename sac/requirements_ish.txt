@@ -1,0 +1,43 @@
+### SUMMARY:
+- follow instructions on SAC readme as usual (switch environemnt.yml with environment_py2.yml)
+- once installed, activate sac_py2
+- install things below with pip
+- ready to tango
+
+### NEW EDITION (sac_py2 conda env)
+## need to have pip in conda env
+pip install cached_property
+pip install tensorflow-gpu==1.2.1 ## IMPORTANT TO DOWNGRADE
+pip install theano==0.7.0 ## IMPORTANT TO DOWNGRADE
+pip install gtimer
+pip install gym==0.7.4 ## IMPORTANT TO DOWNGRADE
+pip install cloudpickle
+pip install lasagne
+pip install pyprind
+
+## For ros
+pip install rospkg
+pip install catkin_pkg
+pip install defusedxml
+
+- Modify instrument.py in rllab/rllab/misc/instrument.py (line 972) to remove comma after config.AWS_EXTRA_CONFIGS, and after **kwargs
+- changed "from sac.core.serializable" to "from ..core.serializable" in sac/sac/algos/base.py (same with misc following it)
+- changed all from "sac.bla" to "..bla" in diayn.py in sac/algos
+
+
+Change: "class ReplayBuffer(object, metaclass=abs.bla):" to "__metaclass__ = abc.ABCMeta" in replay_buffer.py
+
+Change function "get_output_for" to the following (in value_function.py to handle difference in default args parsing for python2):
+def get_output_for(self, *inputs, **kwargs):
+    if 'reuse' not in kwargs.keys():
+        reuse = False
+    else:
+        reuse = kwargs['reuse']
+    with tf.variable_scope(self._name, reuse=reuse):
+        value_t = mlp(
+            inputs=inputs,
+            output_nonlinearity=None,
+            layer_sizes=self._layer_sizes,
+        )  # N
+
+    return value_t

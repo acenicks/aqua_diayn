@@ -1,0 +1,5 @@
+<launch>
+    <include file="$(find aqua_gazebo)/launch/aqua.launch"></include>
+    <include file="$(find robot_learning)/launch/basic.launch"></include>
+    <node name="random_agent" pkg="aqua_diayn" type="random_agent.py"/>
+</launch>
