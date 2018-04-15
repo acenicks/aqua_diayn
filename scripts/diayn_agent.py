@@ -10,7 +10,7 @@ from rllab.envs.normalized_env import normalize
 from rllab import spaces
 
 from sac.algos import DIAYN
-from sac.envs.aqua_env import AquaEnv
+from aqua_sac_env import AquaEnv
 from sac.misc.instrument import run_sac_experiment
 from sac.misc.utils import timestamp
 from sac.policies.gmm import GMMPolicy

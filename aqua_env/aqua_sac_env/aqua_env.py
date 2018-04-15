@@ -7,8 +7,6 @@ import traceback
 import logging
 
 import rospy
-from aqua_gym_envs.aqua_env.ros_plant import ROSPlant
-from gym.envs.registration import EnvSpec
 
 
 try:

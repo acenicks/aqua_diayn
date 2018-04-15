@@ -2,7 +2,8 @@
 # license removed for brevity
 import rospy
 import numpy as np
-from aqua_gym_envs.aqua_env.ros_plant import ROSPlant
+import gym
+import aqua_gym_env
 from aquacore.srv import SetGait
 
 
@@ -21,7 +22,7 @@ if __name__ == '__main__':
     rospy.init_node('random_agent', anonymous=True)
     set_gait_flex_sine()
 
-    env = ROSPlant()
+    env = gym.envs.make('Aqua-v0')
     env.reset()
 
     while True:

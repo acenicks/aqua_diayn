@@ -393,7 +393,6 @@ class DIAYN(SAC):
                 path_length_list = []
                 z = self._sample_z()
                 aug_obs = utils.concat_obs_z(observation, z, self._num_skills)
-                print("Aug Obs in DIAYN: ", aug_obs)
 
                 for t in range(self._epoch_length):
                     iteration = t + epoch * self._epoch_length

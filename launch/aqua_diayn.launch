@@ -1,9 +1,9 @@
 <launch>
-  <arg name="project_ws" value="$(env PROJECT_WS_PATH)"/>
-  <arg name="log_dir" default="$(arg project_ws)/../data" />
+  <arg name="project_path" value="$(env PROJECT_PATH)"/>
+  <arg name="log_dir" default="$(arg project_path)/data" />
 
     <include file="$(find aqua_gazebo)/launch/aqua.launch"></include>
-    <include file="$(find robot_learning)/launch/basic.launch"></include>
+    <include file="$(find aqua_diayn)/launch/basic.launch"></include>
 
     <node
       name="diayn_agent"
