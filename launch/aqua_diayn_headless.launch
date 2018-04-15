@@ -1,5 +1,16 @@
 <launch>
+  <arg name="project_ws" value="$(env PROJECT_WS_PATH)"/>
+  <arg name="log_dir" default="$(arg project_ws)/../data" />
+
     <include file="$(find aqua_gazebo)/launch/headless.launch"></include>
     <include file="$(find robot_learning)/launch/basic.launch"></include>
-    <node name="random_agent" pkg="aqua_diayn" type="random_agent.py" />
+
+    <node
+      name="diayn_agent"
+      pkg="aqua_diayn"
+      type="diayn_agent.py"
+      args="--log_dir=$(arg log_dir)"
+      output="screen">
+    </node>
+
 </launch>

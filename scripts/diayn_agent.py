@@ -28,14 +28,14 @@ SHARED_PARAMS = {
     'tau': 0.01,
     'K': 4,
     'layer_size': 300,
-    'batch_size': 128,
+    'batch_size': 10,
     'max_pool_size': 1E6,
     'n_train_repeat': 1,
-    'epoch_length': 1000,
+    'epoch_length': 50,
     'snapshot_mode': 'gap',
     'snapshot_gap': 10,
     'sync_pkl': True,
-    'num_skills': 5,
+    'num_skills': 2,
     'scale_entropy': 0.1,
     'include_actions': False,
     'learn_p_z': False,
@@ -48,8 +48,8 @@ ENV_PARAMS = {
     'aqua': {
         'prefix': 'aqua',
         'env_name': 'aqua',
-        'max_path_length': 1000,
-        'n_epochs': 10000,
+        'max_path_length': 5,
+        'n_epochs': 10,
     }
 }
 DEFAULT_ENV = 'aqua'
@@ -64,7 +64,7 @@ def parse_args(rospy_args):
                         default='aqua')
     parser.add_argument('--exp_name', type=str, default=timestamp())
     parser.add_argument('--mode', type=str, default='local')
-    parser.add_argument('--log_dir', type=str, default='/home/automation/nikhil/workspace/courses/COMP767/project/data')
+    parser.add_argument('--log_dir', type=str, default=None)
     args = parser.parse_args(rospy_args)
 
     return args
