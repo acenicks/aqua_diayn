@@ -7,7 +7,7 @@
 ## Project file structure:
 The project file structure should look like this:
 
-'''
+```
 project_root
 ├── aqua_ws
 │   └── src
@@ -36,4 +36,4 @@ project_root
 │       ├── aquapositioning
 │       └── robot_learning
 └── data
-'''
+```
