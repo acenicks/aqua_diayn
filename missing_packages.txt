@@ -1,0 +1,15 @@
+# For sac:
+pip install cached_property
+pip install tensorflow-gpu==1.2.1 ## IMPORTANT TO DOWNGRADE
+pip install theano==0.7.0 ## IMPORTANT TO DOWNGRADE
+pip install gtimer
+pip install numpy
+pip install gym==0.7.4 ## IMPORTANT TO DOWNGRADE
+pip install cloudpickle
+pip install lasagne
+pip install pyprind
+
+## For ros:
+pip install rospkg
+pip install catkin_pkg
+pip install defusedxml
