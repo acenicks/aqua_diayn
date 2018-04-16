@@ -195,7 +195,7 @@ def set_gait_flex_sine():
 
 if __name__ == '__main__':
 
-    rospy.init_node('diayn_agent', anonymous=True)
+    # rospy.init_node('diayn_agent', anonymous=True)
     set_gait_flex_sine()
 
     # env = ROSPlant()
