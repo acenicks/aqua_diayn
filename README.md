@@ -16,7 +16,7 @@ ros_ws/
 |   ├── aquadepth
 |   ├── aqua_description
 |   |
-|   ├── aqua_diayn
+|   ├── aqua_diayn (this repo)
 |   |   ├── aqua_env
 |   |   ├── CMakeLists.txt
 |   |   ├── launch
@@ -34,6 +34,7 @@ ros_ws/
 |   ├── aqualaunch
 |   ├── aquapositioning
 |   └── robot_learning
+└── data (default location)
 ```
 
 
