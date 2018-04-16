@@ -40,6 +40,8 @@ SHARED_PARAMS = {
     'include_actions': False,
     'learn_p_z': False,
     'add_p_z': True,
+    'find_best_skill_interval': 10,
+    'best_skill_n_rollouts': 10
 }
 
 TAG_KEYS = ['seed']
@@ -146,7 +148,8 @@ def run_experiment(variant):
         pool=pool,
         qf=qf,
         vf=vf,
-
+        find_best_skill_interval=variant['find_best_skill_interval'],
+        best_skill_n_rollouts=variant['best_skill_n_rollouts'],
         lr=variant['lr'],
         scale_entropy=variant['scale_entropy'],
         discount=variant['discount'],
@@ -196,7 +199,7 @@ def set_gait_flex_sine():
 
 if __name__ == '__main__':
 
-    rospy.init_node('diayn_agent', anonymous=True)
+    # rospy.init_node('diayn_agent', anonymous=True)
     set_gait_flex_sine()
 
     # env = ROSPlant()

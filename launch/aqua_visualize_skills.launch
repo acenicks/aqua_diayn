@@ -1,0 +1,16 @@
+<launch>
+  <arg name="project_path" value="$(env PROJECT_PATH)"/>
+  <arg name="skills_file" />
+
+    <include file="$(find aqua_gazebo)/launch/aqua.launch"></include>
+    <include file="$(find aqua_diayn)/launch/basic.launch"></include>
+
+    <node
+      name="visualize_skills"
+      pkg="aqua_diayn"
+      type="visualize_skills.py"
+      args="--file=$(arg skills_file)"
+      output="screen">
+    </node>
+
+</launch>
