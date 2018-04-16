@@ -1,6 +1,6 @@
 <launch>
   <arg name="project_path" value="$(env PROJECT_PATH)"/>
-  <arg name="skills_file" default="$(arg project_path)/data/seed_1/itr_0.pkl" />
+  <arg name="skills_file" />
 
     <include file="$(find aqua_gazebo)/launch/aqua.launch"></include>
     <include file="$(find aqua_diayn)/launch/basic.launch"></include>

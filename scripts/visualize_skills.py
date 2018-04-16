@@ -8,11 +8,22 @@ from sac.misc import utils
 from sac.policies.hierarchical_policy import FixedOptionPolicy
 from sac.misc.sampler import rollouts
 
+from aquacore.srv import SetGait
 import rospy
+
+def set_gait_flex_sine():
+    rospy.wait_for_service('/aqua/set_gait')
+    try:
+        resp = rospy.ServiceProxy('/aqua/set_gait', SetGait)
+        resp('flexible-sine')
+        return resp
+    except rospy.ServiceException, e:
+        print "Service call failed: %s" % e
 
 if __name__ == "__main__":
 
     # rospy.init_node('visualize_skills', anonymous=True)
+    set_gait_flex_sine()
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--file', type=str, help='Path to the snapshot file.')
@@ -26,7 +37,7 @@ if __name__ == "__main__":
     parser.set_defaults(deterministic=True)
 
     args = parser.parse_args(rospy.myargv()[1:])
-    
+
     filename = os.path.splitext(args.file)[0] + '.avi'
     best_filename = os.path.splitext(args.file)[0] + '_best.avi'
     worst_filename = os.path.splitext(args.file)[0] + '_worst.avi'
