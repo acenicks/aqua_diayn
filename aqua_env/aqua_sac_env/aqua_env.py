@@ -58,12 +58,19 @@ class NoVideoSchedule(object):
     def __call__(self, count):
         return False
 
-def test_reward(state):
-    return 1
+# def maintain_depth(state):
+#     if state[3] == 1.0:
+#         return 0.0
+#     else:
+#         return -1.0
+
+def default_reward(state):
+    return 1.0
 
 class AquaEnv(Env, Serializable):
-    def __init__(self, env_name, record_video=False, video_schedule=None, log_dir=None, record_log=False,
-                 force_reset=True):
+    def __init__(self, env_name, record_video=False, video_schedule=None,
+                 log_dir=None, record_log=False,
+                 force_reset=True, loss_func=default_reward):
         if log_dir is None:
             if logger.get_snapshot_dir() is None:
                 logger.log("Warning: skipping Gym environment monitoring since snapshot_dir not configured.")
@@ -75,7 +82,7 @@ class AquaEnv(Env, Serializable):
         rospy.init_node('diayn_env_node', anonymous=True)
         # env = ROSPlant()
         env = gym.envs.make('Aqua-v0')
-        env.loss_func = test_reward
+        env.loss_func = loss_func
         # HACK: Gets rid of the TimeLimit wrapper that sets 'done = True' when
         # the time limit specified for each environment has been passed and
         # therefore the environment is not Markovian (terminal condition depends
