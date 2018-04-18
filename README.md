@@ -4,7 +4,18 @@
 - Karim Koreitem (260460964 | karim.koreitem@mail.mcgill.ca)
 - Nikhil Kakodkar (260578689 | nikhil.kakodkar@mail.mcgill.ca)
 
-## Project file structure:
+## Overview
+This project implements a deep reinforcement learning algorithm for discovering a set of useful skills in an unsupervised fashion. The algorithm is based on the paper Diversity is All You Need: Learning Diverse Skills without a Reward Function.
+
+**What:**
+Learning 'diverse' skills. Diverse in the sense that the skills are optimized to have high entropy in the state space. So better exploration.
+
+**Why:**
+1. Use these skills as pretraining mechnism for further learning particular tasks.
+2. May be use these skills as a curriculum for achieving complex tasks
+3. We also use this method to learn sets of skills over various actuator failure modes
+
+## Project file structure
 The project file structure should look like this:
 
 ```
@@ -38,7 +49,7 @@ ros_ws/
 ```
 
 
-## Environment setup:
+## Environment setup
 
 
 1. Install sac_py2 conda environment:

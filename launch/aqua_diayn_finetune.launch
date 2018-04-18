@@ -1,0 +1,18 @@
+<launch>
+  <arg name="project_path" value="$(env PROJECT_PATH)"/>
+  <arg name="log_dir" default="$(arg project_path)/data" />
+  <arg name="skills_file"/>
+  <!-- <arg name="task_name"/> -->
+
+    <include file="$(find aqua_gazebo)/launch/aqua.launch"></include>
+    <include file="$(find aqua_diayn)/launch/basic.launch"></include>
+
+    <node
+      name="diayn_finetune"
+      pkg="aqua_diayn"
+      type="diayn_finetune.py"
+      args="--snapshot=$(arg skills_file) --log_dir=$(arg log_dir)"
+      output="screen">
+    </node>
+
+</launch>
