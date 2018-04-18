@@ -10,6 +10,8 @@ from std_srvs.srv import Empty as EmptySrv
 from robot_learning.msg import ExperienceData
 from robot_learning.srv import T2VInfo
 
+from aqua_diayn.srv import EnvSpaceBounds
+
 class ROSPlant(gym.Env):
     '''
     Class for collecting msg and executing policies on a ROS-enabled robot
@@ -20,6 +22,9 @@ class ROSPlant(gym.Env):
 
     command_dims_srv_name = '/rl/command_dims'
     state_dims_srv_name = '/rl/state_dims'
+
+    state_bounds_srv_name = '/rl/state_bounds'
+    command_bounds_srv_name = '/rl/command_bounds'
 
     def __init__(self, state0_dist=None, loss_func=None, dt=0.5,
                  noise_dist=None, angle_dims=[], name='ROSPlant',
@@ -92,22 +97,52 @@ class ROSPlant(gym.Env):
         self.t = rospy.get_time()
 
     def init_obs_act_spaces(self):
-        rospy.loginfo(
-            '[%s] waiting for %s...' % (self.name,
-                                        ROSPlant.command_dims_srv_name))
-        rospy.wait_for_service(ROSPlant.command_dims_srv_name)
-        cdims = rospy.ServiceProxy(ROSPlant.command_dims_srv_name, T2VInfo)
-        rospy.loginfo(
-            '[%s] waiting for %s...' % (self.name,
-                                        ROSPlant.state_dims_srv_name))
-        rospy.wait_for_service(ROSPlant.state_dims_srv_name)
-        sdims = rospy.ServiceProxy(ROSPlant.state_dims_srv_name, T2VInfo)
+        # rospy.loginfo(
+        #     '[%s] waiting for %s...' % (self.name,
+        #                                 ROSPlant.command_dims_srv_name))
+        # rospy.wait_for_service(ROSPlant.command_dims_srv_name)
+        # cdims = rospy.ServiceProxy(ROSPlant.command_dims_srv_name, T2VInfo)
+        # rospy.loginfo(
+        #     '[%s] waiting for %s...' % (self.name,
+        #                                 ROSPlant.state_dims_srv_name))
+        # rospy.wait_for_service(ROSPlant.state_dims_srv_name)
+        # sdims = rospy.ServiceProxy(ROSPlant.state_dims_srv_name, T2VInfo)
 
-        # TODO get min max ranges from config file or from service
-        o_lims = np.array([1e3 for i in range(sdims().value)])
-        self.observation_space = spaces.Box(-o_lims, o_lims)
-        a_lims = np.array([1e3 for i in range(cdims().value)])
-        self.action_space = spaces.Box(-a_lims, a_lims)
+        # o_lims = np.array([1e3 for i in range(sdims().value)])
+        # self.observation_space = spaces.Box(-o_lims, o_lims)
+        # a_lims = np.array([1e3 for i in range(cdims().value)])
+        # self.action_space = spaces.Box(-a_lims, a_lims)
+
+        rospy.loginfo(
+            '[%s] waiting for %s...' % (self.name,
+                                        ROSPlant.state_bounds_srv_name))
+        rospy.wait_for_service(ROSPlant.state_bounds_srv_name)
+        s_bounds = rospy.ServiceProxy(ROSPlant.state_bounds_srv_name, EnvSpaceBounds)
+
+        rospy.loginfo(
+            '[%s] waiting for %s...' % (self.name,
+                                        ROSPlant.command_bounds_srv_name))
+        rospy.wait_for_service(ROSPlant.command_bounds_srv_name)
+        c_bounds = rospy.ServiceProxy(ROSPlant.command_bounds_srv_name, EnvSpaceBounds)
+
+        o_lbound = []
+        o_ubound = []
+        for dim_bounds in s_bounds().bounds:
+            o_lbound.append(dim_bounds.LowBound)
+            o_ubound.append(dim_bounds.UpBound)
+        o_lbound = np.array(o_lbound)
+        o_ubound = np.array(o_ubound)
+
+        a_lbound = []
+        a_ubound = []
+        for dim_bounds in c_bounds().bounds:
+            a_lbound.append(dim_bounds.LowBound)
+            a_ubound.append(dim_bounds.UpBound)
+        a_lbound = np.array(a_lbound)
+        a_ubound = np.array(a_ubound)
+
+        self.observation_space = spaces.Box(o_lbound, o_ubound)
+        self.action_space = spaces.Box(a_lbound, a_ubound)
 
     def experience_callback(self, msg):
         # put incoming messages into experience queue

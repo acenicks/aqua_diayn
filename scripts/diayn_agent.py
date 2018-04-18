@@ -88,8 +88,7 @@ def get_variants(args):
 
 def run_experiment(variant):
     if variant['env_name'] == 'aqua':
-        # env = normalize(AquaEnv(variant['env_name']))
-        env = AquaEnv(variant['env_name'])
+        env = normalize(AquaEnv(variant['env_name']))
 
     obs_space = env.spec.observation_space
     assert isinstance(obs_space, spaces.Box)

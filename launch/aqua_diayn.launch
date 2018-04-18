@@ -1,9 +1,17 @@
 <launch>
   <arg name="project_path" value="$(env PROJECT_PATH)"/>
-  <arg name="log_dir" default="$(arg project_path)/data" />
+  <arg name="log_dir" default="$(arg project_path)/data"/>
+  <arg name="topic_description" default="$(find aqua_diayn)/launch/topic_description/6flipper_topics.yml"/>
 
     <include file="$(find aqua_gazebo)/launch/aqua.launch"></include>
-    <include file="$(find aqua_diayn)/launch/basic.launch"></include>
+
+    <include file="$(find aqua_diayn)/launch/basic.launch">
+      <arg name="topic_description" value="$(arg topic_description)"/>
+    </include>
+
+    <node name="env_spaces" pkg="aqua_diayn" type="env_spaces.py" output="screen">
+        <rosparam command="load" file="$(arg topic_description)"/>
+    </node>
 
     <node
       name="diayn_agent"
