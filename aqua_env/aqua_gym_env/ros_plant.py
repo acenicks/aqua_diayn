@@ -8,9 +8,40 @@ from Queue import Queue
 
 from std_srvs.srv import Empty as EmptySrv
 from robot_learning.msg import ExperienceData
-from robot_learning.srv import T2VInfo
+# from robot_learning.srv import T2VInfo
 
 from aqua_diayn.srv import EnvSpaceBounds
+from aqua_diayn.msg import TargetState
+
+
+class ExponentialReward():
+    def __init__(self, n_dims, c=1.0):
+        self.n_dims = n_dims
+        self.c = c
+        self.scale_factor = - 1./(2. * self.c)
+        self.Q = np.eye(n_dims)
+
+    def __call__(self, curr_state, target_state=None):
+        reward = 0.
+
+        if target_state is not None:
+
+            if isinstance(curr_state, list):
+                curr_state = np.array(curr_state).reshape(-1, 1)
+            if isinstance(target_state, list):
+                target_state = np.array(target_state).reshape(-1, 1)
+
+            if curr_state.ndim == 1:
+                curr_state.reshape(-1, 1)
+            if target_state.ndim == 1:
+                target_state.reshape(-1, 1)
+
+            err = curr_state - target_state
+            reward = np.matmul(np.matmul(err.T, self.Q), err)
+            reward = np.exp(self.scale_factor * reward)
+
+        return reward
+
 
 class ROSPlant(gym.Env):
     '''
@@ -48,11 +79,17 @@ class ROSPlant(gym.Env):
         # appropriate topics
         self.init_obs_act_spaces()
 
+        self.loss_func = \
+            ExponentialReward(n_dims=self.observation_space.shape[0])
+
         # initialize publishers and subscribers
         self.command_pub = rospy.Publisher(
             '/rl/command_data', ExperienceData, queue_size=-1)
         self.experience_sub = rospy.Subscriber(
             '/rl/experience_data', ExperienceData, self.experience_callback,
+            queue_size=-1)
+        self.target_state = rospy.Subscriber(
+            '/rl/target_state', TargetState, self.target_state_callback,
             queue_size=-1)
 
         # get initial state
@@ -80,6 +117,8 @@ class ROSPlant(gym.Env):
         # function will return None for the reward/loss function
         self.loss_func = loss_func
 
+        self.target_state = None
+
     def ros_init(self, init_ros_node=False):
         # init plant ros node
         if init_ros_node:
@@ -97,21 +136,6 @@ class ROSPlant(gym.Env):
         self.t = rospy.get_time()
 
     def init_obs_act_spaces(self):
-        # rospy.loginfo(
-        #     '[%s] waiting for %s...' % (self.name,
-        #                                 ROSPlant.command_dims_srv_name))
-        # rospy.wait_for_service(ROSPlant.command_dims_srv_name)
-        # cdims = rospy.ServiceProxy(ROSPlant.command_dims_srv_name, T2VInfo)
-        # rospy.loginfo(
-        #     '[%s] waiting for %s...' % (self.name,
-        #                                 ROSPlant.state_dims_srv_name))
-        # rospy.wait_for_service(ROSPlant.state_dims_srv_name)
-        # sdims = rospy.ServiceProxy(ROSPlant.state_dims_srv_name, T2VInfo)
-
-        # o_lims = np.array([1e3 for i in range(sdims().value)])
-        # self.observation_space = spaces.Box(-o_lims, o_lims)
-        # a_lims = np.array([1e3 for i in range(cdims().value)])
-        # self.action_space = spaces.Box(-a_lims, a_lims)
 
         rospy.loginfo(
             '[%s] waiting for %s...' % (self.name,
@@ -143,6 +167,13 @@ class ROSPlant(gym.Env):
 
         self.observation_space = spaces.Box(o_lbound, o_ubound)
         self.action_space = spaces.Box(a_lbound, a_ubound)
+
+    def target_state_callback(self, msg):
+        try:
+            assert np.array(msg.target_state).shape == self.observation_space.shape
+            self.target_state = np.array(msg.target_state)
+        except AssertionError:
+            print('AssertionError: target_state does not match observation space dimension')
 
     def experience_callback(self, msg):
         # put incoming messages into experience queue
@@ -204,12 +235,16 @@ class ROSPlant(gym.Env):
         info['action'] = action
 
         # evaluate cost, if given
-        cost = None
+
+        # CHANGED: from cost = None to reward = 0.0
+        #          for compatibility with SAC codebase
+        #          Hence the default reward will be 0.0
+        reward = 0.0
         if self.loss_func is not None:
-            cost = self.loss_func(self.state[None, :])
+            reward = self.loss_func(self.state, self.target_state)
 
         # return output following the openai gym convention
-        return self.state, cost, False, info
+        return self.state, reward, False, info
 
     def _reset(self):
         '''

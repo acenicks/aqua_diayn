@@ -17,7 +17,6 @@ except Exception as e:
     traceback.print_exc()
 
 import os
-import os.path as osp
 from rllab.envs.base import Env, Step
 from rllab.core.serializable import Serializable
 from rllab.spaces.box import Box
@@ -59,13 +58,10 @@ class NoVideoSchedule(object):
         return False
 
 
-def default_reward(state):
-    return 1.0
-
 class AquaEnv(Env, Serializable):
     def __init__(self, env_name, record_video=False, video_schedule=None,
                  log_dir=None, record_log=False,
-                 force_reset=True, loss_func=default_reward):
+                 force_reset=True):
         if log_dir is None:
             if logger.get_snapshot_dir() is None:
                 logger.log("Warning: skipping Gym environment monitoring since snapshot_dir not configured.")
@@ -73,11 +69,9 @@ class AquaEnv(Env, Serializable):
                 log_dir = os.path.join(logger.get_snapshot_dir(), "gym_log")
         Serializable.quick_init(self, locals())
 
-        # env = gym.envs.make(env_name)
         rospy.init_node('diayn_env_node', anonymous=True)
-        # env = ROSPlant()
+
         env = gym.envs.make('Aqua-v0')
-        env.loss_func = loss_func
         # HACK: Gets rid of the TimeLimit wrapper that sets 'done = True' when
         # the time limit specified for each environment has been passed and
         # therefore the environment is not Markovian (terminal condition depends
