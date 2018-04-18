@@ -58,11 +58,6 @@ class NoVideoSchedule(object):
     def __call__(self, count):
         return False
 
-# def maintain_depth(state):
-#     if state[3] == 1.0:
-#         return 0.0
-#     else:
-#         return -1.0
 
 def default_reward(state):
     return 1.0
