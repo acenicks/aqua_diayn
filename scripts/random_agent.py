@@ -22,13 +22,21 @@ if __name__ == '__main__':
     rospy.init_node('random_agent', anonymous=True)
     set_gait_flex_sine()
 
+    step = 0
+
     env = gym.envs.make('Aqua-v0')
     env.reset()
 
     while True:
+
+        if step % 10 == 0:
+            env.reset()
+
         amplitudes = np.random.uniform(low=-np.pi, high=np.pi, size=(6))
         leg_offsets = np.random.uniform(low=-np.pi, high=np.pi, size=(6))
         phase_offsets = np.random.uniform(low=-np.pi, high=np.pi, size=(6))
 
         action = np.hstack((amplitudes, leg_offsets, phase_offsets))
         state, cost, _, info = env.step(action)
+
+        step += 1
