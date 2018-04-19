@@ -1,9 +1,30 @@
 <launch>
   <arg name="project_path" value="$(env PROJECT_PATH)"/>
   <arg name="skills_file" />
+  <arg name="topic_description" default="$(find aqua_diayn)/launch/topic_description/6flipper_topics.yml"/>
+  <!-- <arg name="task_description" default="$(find aqua_diayn)/launch/task_description/bellyup.yml"/> -->
 
     <include file="$(find aqua_gazebo)/launch/aqua.launch"></include>
-    <include file="$(find aqua_diayn)/launch/basic.launch"></include>
+    <include file="$(find aqua_diayn)/launch/basic.launch">
+      <arg name="topic_description" value="$(arg topic_description)"/>
+    </include>
+
+    <node
+      name="env_spaces"
+      pkg="aqua_diayn"
+      type="env_spaces.py"
+      output="screen">
+        <rosparam command="load" file="$(arg topic_description)"/>
+    </node>
+
+    <!-- <node
+      name="task_manager"
+      pkg="aqua_diayn"
+      type="task_manager.py"
+      output="screen">
+        <rosparam command="load" file="$(arg task_description)"/>
+    </node> -->
+
 
     <node
       name="visualize_skills"

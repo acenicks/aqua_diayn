@@ -27,10 +27,10 @@ SHARED_PARAMS = {
     'tau': 0.01,
     'K': 4,
     'layer_size': 300,
-    'batch_size': 2,
+    'batch_size': 3,
     'max_pool_size': 1E6,
     'n_train_repeat': 1,
-    'epoch_length': 10,
+    'epoch_length': 5,
     'snapshot_mode': 'gap',
     'snapshot_gap': 10,
     'sync_pkl': True,
@@ -49,7 +49,7 @@ ENV_PARAMS = {
     'aqua': {
         'prefix': 'aqua',
         'env_name': 'aqua',
-        'max_path_length': 10,
+        'max_path_length': 5,
         'n_epochs': 100,
     }
 }

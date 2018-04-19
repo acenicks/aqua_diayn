@@ -43,6 +43,10 @@ class ExponentialReward():
 
 def angles2vector(state, units):
     aug_state = []
+
+    if state is None:
+        return None
+
     for idx, unit in enumerate(units):
         if unit == 'radians':
             angle_sin = np.sin(state[idx])
@@ -99,7 +103,7 @@ class ROSPlant(gym.Env):
         self.experience_sub = rospy.Subscriber(
             '/rl/experience_data', ExperienceData, self.experience_callback,
             queue_size=-1)
-        self.target_state = rospy.Subscriber(
+        self.target_state_sub = rospy.Subscriber(
             '/rl/target_state', TargetState, self.target_state_callback,
             queue_size=-1)
 
@@ -123,6 +127,9 @@ class ROSPlant(gym.Env):
         # where we know how to reset to an initial state, (e.g. a robotic arm)
         self.state0_dist = state0_dist
 
+        # Target state representing a particular task
+        self.target_state = None
+
         # user specified reward/loss function. takes as input state vector,
         # produces as output scalar reward/cost. If not specified, the step
         # function will return None for the reward/loss function
@@ -130,8 +137,6 @@ class ROSPlant(gym.Env):
             self.loss_func = ExponentialReward()
         else:
             self.loss_func = loss_func
-
-        self.target_state = None
 
     def ros_init(self, init_ros_node=False):
         # init plant ros node
@@ -189,11 +194,13 @@ class ROSPlant(gym.Env):
         self.action_space = spaces.Box(a_lbound, a_ubound)
 
     def target_state_callback(self, msg):
+        print("I shouldn't be here.")
         try:
             assert np.array(msg.target_state).shape == self.observation_space.shape
             self.target_state = np.array(msg.target_state)
         except AssertionError:
-            print('AssertionError: target_state does not match observation space dimension')
+            print('AssertionError: target_state does not match observation '
+                  'space dimension')
 
     def experience_callback(self, msg):
         # put incoming messages into experience queue
@@ -255,7 +262,6 @@ class ROSPlant(gym.Env):
         info['action'] = action
 
         # evaluate cost, if given
-
         # CHANGED: from cost = None to reward = 0.0
         #          for compatibility with SAC codebase
         #          Hence the default reward will be 0.0
