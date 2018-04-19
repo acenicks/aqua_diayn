@@ -194,7 +194,6 @@ class ROSPlant(gym.Env):
         self.action_space = spaces.Box(a_lbound, a_ubound)
 
     def target_state_callback(self, msg):
-        print("I shouldn't be here.")
         try:
             assert np.array(msg.target_state).shape == self.observation_space.shape
             self.target_state = np.array(msg.target_state)
