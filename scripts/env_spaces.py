@@ -13,6 +13,7 @@ from collections import OrderedDict
 state_bounds_srv_name = '/rl/state_bounds'
 command_bounds_srv_name = '/rl/command_bounds'
 
+state_units_srv_name = '/rl/state_units'
 
 # load_package and load message are shamelessly copied from the
 # rosserial_python SerialClient code
@@ -149,9 +150,46 @@ def get_command_bounds(req):
     return EnvSpaceBoundsResponse(command_bounds)
 
 
+def get_state_units(req):
+    state_topics_list = rospy.get_param("~experience_state_topics", [])
+
+    topic_types = OrderedDict()
+    state_subscribers = OrderedDict()
+    filtered_fields = OrderedDict()
+    topic_units = OrderedDict()
+
+    for topic in state_topics_list:
+        topic_name = topic['topic_name']
+        message_type = topic['type']
+        m = load_message(message_type['package'], message_type['name'])
+
+        state_subscribers[topic_name] = message_filters.Subscriber(
+            topic_name, m)
+
+        topic_types[topic_name] = m
+        filtered_fields[topic_name] = topic.get('filter', m.__slots__)
+        topic_units[topic_name] = topic.get('units')
+
+    state_units = []
+    for topic in state_subscribers:
+        msg = topic_types[topic]()
+        for field, field_units in zip(filtered_fields[topic], topic_units[topic]):
+            field_value = recursive_getattr(msg, field)
+            dim_units = field_units
+            if not (hasattr(field_value, '_type')
+                    and field_value._type == 'std_msgs/Header'):
+                numeric_fields = get_all_numeric_fields(field_value)
+                for dim in range(len(numeric_fields)):
+                    state_units.append(dim_units)
+
+    return EnvSpaceUnitsResponse(state_units)
+
+
 if __name__ == "__main__":
     rospy.init_node('env_spaces')
 
     state_bounds_srv = rospy.Service(state_bounds_srv_name, EnvSpaceBounds, get_state_bounds)
     command_bounds_srv = rospy.Service(command_bounds_srv_name, EnvSpaceBounds, get_command_bounds)
+
+    state_units_srv = rospy.Service(state_units_srv_name, EnvSpaceUnits, get_state_units)
     rospy.spin()

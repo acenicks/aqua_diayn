@@ -9,10 +9,12 @@ experience_state_topics:
     - topic_name: /aqua/state
       type: {package: aquacore, name: StateMsg}
       filter: ["RollAngle","PitchAngle","YawAngle", "Depth"]
+      units: ["radians", "radians", "radians", "meters"]
       bounds: [[-3.14, 3.14], [-3.14, 3.14], [-3.14, 3.14], [0.0, 6.0]]
     - topic_name: /aqua/imu
       type: {package: sensor_msgs, name: Imu}
       filter: ["angular_velocity.x","angular_velocity.y","angular_velocity.z"]
+      units: ["radians_per_seconds", "radians_per_seconds", "radians_per_seconds"]
       bounds: [[-3.14, 3.14], [-3.14, 3.14], [-3.14, 3.14]]
 
 # experience_command_topics corresponds to the topics we want to publish when
@@ -23,11 +25,6 @@ experience_command_topics:
     - topic_name: /aqua/periodic_leg_command
       type: {package: aquacore, name: PeriodicLegCommand}
       filter: ["amplitudes[2]","amplitudes[5]","leg_offsets[2]","leg_offsets[5]"]
+      units: ["radians", "radians", "radians", "radians"]
       bounds: [[-0.785, 0.785], [-0.785, 0.785], [-0.785, 0.785], [-0.785, 0.785]]
       default_values: { frequencies: 2.5 }
-
-# preprocessing operations are square, abs, deg2rad and rad2deg
-preprocessing_operations:
-    RollAngle: ['radians']
-    PitchAngle: ['radians']
-    YawAngle: ['radians']

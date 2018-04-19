@@ -10,16 +10,14 @@ from std_srvs.srv import Empty as EmptySrv
 from robot_learning.msg import ExperienceData
 # from robot_learning.srv import T2VInfo
 
-from aqua_diayn.srv import EnvSpaceBounds
+from aqua_diayn.srv import EnvSpaceBounds, EnvSpaceUnits
 from aqua_diayn.msg import TargetState
 
 
 class ExponentialReward():
-    def __init__(self, n_dims, c=1.0):
-        self.n_dims = n_dims
+    def __init__(self, c=1.0):
         self.c = c
         self.scale_factor = - 1./(2. * self.c)
-        self.Q = np.eye(n_dims)
 
     def __call__(self, curr_state, target_state=None):
         reward = 0.
@@ -27,20 +25,34 @@ class ExponentialReward():
         if target_state is not None:
 
             if isinstance(curr_state, list):
-                curr_state = np.array(curr_state).reshape(-1, 1)
+                curr_state = np.array(curr_state)
             if isinstance(target_state, list):
-                target_state = np.array(target_state).reshape(-1, 1)
+                target_state = np.array(target_state)
 
-            if curr_state.ndim == 1:
-                curr_state.reshape(-1, 1)
-            if target_state.ndim == 1:
-                target_state.reshape(-1, 1)
+            curr_state.reshape(-1, 1)
+            target_state.reshape(-1, 1)
+
+            Q = np.eye(len(curr_state))
 
             err = curr_state - target_state
-            reward = np.matmul(np.matmul(err.T, self.Q), err)
+            reward = np.matmul(np.matmul(err.T, Q), err)
             reward = np.exp(self.scale_factor * reward)
 
         return reward
+
+
+def angles2vector(state, units):
+    aug_state = []
+    for idx, unit in enumerate(units):
+        if unit == 'radians':
+            angle_sin = np.sin(state[idx])
+            angle_cos = np.cos(state[idx])
+            aug_state.append(angle_sin)
+            aug_state.append(angle_cos)
+        else:
+            aug_state.append(state[idx])
+
+    return aug_state
 
 
 class ROSPlant(gym.Env):
@@ -56,6 +68,8 @@ class ROSPlant(gym.Env):
 
     state_bounds_srv_name = '/rl/state_bounds'
     command_bounds_srv_name = '/rl/command_bounds'
+
+    state_units_srv_name = '/rl/state_units'
 
     def __init__(self, state0_dist=None, loss_func=None, dt=0.5,
                  noise_dist=None, angle_dims=[], name='ROSPlant',
@@ -78,9 +92,6 @@ class ROSPlant(gym.Env):
         # Observation and action spaces will be populated by reading from the
         # appropriate topics
         self.init_obs_act_spaces()
-
-        self.loss_func = \
-            ExponentialReward(n_dims=self.observation_space.shape[0])
 
         # initialize publishers and subscribers
         self.command_pub = rospy.Publisher(
@@ -115,7 +126,10 @@ class ROSPlant(gym.Env):
         # user specified reward/loss function. takes as input state vector,
         # produces as output scalar reward/cost. If not specified, the step
         # function will return None for the reward/loss function
-        self.loss_func = loss_func
+        if loss_func is None:
+            self.loss_func = ExponentialReward()
+        else:
+            self.loss_func = loss_func
 
         self.target_state = None
 
@@ -136,6 +150,12 @@ class ROSPlant(gym.Env):
         self.t = rospy.get_time()
 
     def init_obs_act_spaces(self):
+
+        rospy.loginfo(
+            '[%s] waiting for %s...' % (self.name,
+                                        ROSPlant.state_units_srv_name))
+        rospy.wait_for_service(ROSPlant.state_units_srv_name)
+        self.state_units = rospy.ServiceProxy(ROSPlant.state_units_srv_name, EnvSpaceUnits)().units
 
         rospy.loginfo(
             '[%s] waiting for %s...' % (self.name,
@@ -241,7 +261,10 @@ class ROSPlant(gym.Env):
         #          Hence the default reward will be 0.0
         reward = 0.0
         if self.loss_func is not None:
-            reward = self.loss_func(self.state, self.target_state)
+            reward = self.loss_func(
+                                    angles2vector(self.state, self.state_units),
+                                    angles2vector(self.target_state, self.state_units)
+                                    )
 
         # return output following the openai gym convention
         return self.state, reward, False, info
