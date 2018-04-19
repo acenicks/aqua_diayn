@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--file', type=str, help='Path to the snapshot file.')
-    parser.add_argument('--max-path-length', '-l', type=int, default=100)
+    parser.add_argument('--max-path-length', '-l', type=int, default=25)
     parser.add_argument('--speedup', '-s', type=float, default=1)
     parser.add_argument('--deterministic', '-d', dest='deterministic',
                         action='store_true')

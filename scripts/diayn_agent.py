@@ -31,17 +31,17 @@ SHARED_PARAMS = {
     'batch_size': 10,
     'max_pool_size': 1E6,
     'n_train_repeat': 1,
-    'epoch_length': 50,
+    'epoch_length': 25,
     'snapshot_mode': 'gap',
     'snapshot_gap': 10,
     'sync_pkl': True,
-    'num_skills': 2,
+    'num_skills': 10,
     'scale_entropy': 0.1,
     'include_actions': False,
     'learn_p_z': False,
     'add_p_z': True,
     'find_best_skill_interval': 10,
-    'best_skill_n_rollouts': 10
+    'best_skill_n_rollouts': 1
 }
 
 TAG_KEYS = ['seed']
@@ -50,8 +50,8 @@ ENV_PARAMS = {
     'aqua': {
         'prefix': 'aqua',
         'env_name': 'aqua',
-        'max_path_length': 5,
-        'n_epochs': 10,
+        'max_path_length': 25,
+        'n_epochs': 1000,
     }
 }
 DEFAULT_ENV = 'aqua'
