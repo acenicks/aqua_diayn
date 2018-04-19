@@ -8,7 +8,56 @@ from Queue import Queue
 
 from std_srvs.srv import Empty as EmptySrv
 from robot_learning.msg import ExperienceData
-from robot_learning.srv import T2VInfo
+# from robot_learning.srv import T2VInfo
+
+from aqua_diayn.srv import EnvSpaceBounds, EnvSpaceUnits
+from aqua_diayn.msg import TargetState
+
+
+class ExponentialReward():
+    def __init__(self, c=1.0):
+        self.c = c
+        self.scale_factor = - 1./(2. * self.c)
+
+    def __call__(self, curr_state, target_state=None):
+        reward = 0.
+
+        if target_state is not None:
+
+            if isinstance(curr_state, list):
+                curr_state = np.array(curr_state)
+            if isinstance(target_state, list):
+                target_state = np.array(target_state)
+
+            curr_state.reshape(-1, 1)
+            target_state.reshape(-1, 1)
+
+            Q = np.eye(len(curr_state))
+
+            err = curr_state - target_state
+            reward = np.matmul(np.matmul(err.T, Q), err)
+            reward = np.exp(self.scale_factor * reward)
+
+        return reward
+
+
+def angles2vector(state, units):
+    aug_state = []
+
+    if state is None:
+        return None
+
+    for idx, unit in enumerate(units):
+        if unit == 'radians':
+            angle_sin = np.sin(state[idx])
+            angle_cos = np.cos(state[idx])
+            aug_state.append(angle_sin)
+            aug_state.append(angle_cos)
+        else:
+            aug_state.append(state[idx])
+
+    return aug_state
+
 
 class ROSPlant(gym.Env):
     '''
@@ -20,6 +69,11 @@ class ROSPlant(gym.Env):
 
     command_dims_srv_name = '/rl/command_dims'
     state_dims_srv_name = '/rl/state_dims'
+
+    state_bounds_srv_name = '/rl/state_bounds'
+    command_bounds_srv_name = '/rl/command_bounds'
+
+    state_units_srv_name = '/rl/state_units'
 
     def __init__(self, state0_dist=None, loss_func=None, dt=0.5,
                  noise_dist=None, angle_dims=[], name='ROSPlant',
@@ -49,6 +103,9 @@ class ROSPlant(gym.Env):
         self.experience_sub = rospy.Subscriber(
             '/rl/experience_data', ExperienceData, self.experience_callback,
             queue_size=-1)
+        self.target_state_sub = rospy.Subscriber(
+            '/rl/target_state', TargetState, self.target_state_callback,
+            queue_size=-1)
 
         # get initial state
         self.state = self.wait_for_state(dt=0.1*self.dt)[1]
@@ -70,10 +127,16 @@ class ROSPlant(gym.Env):
         # where we know how to reset to an initial state, (e.g. a robotic arm)
         self.state0_dist = state0_dist
 
+        # Target state representing a particular task
+        self.target_state = None
+
         # user specified reward/loss function. takes as input state vector,
         # produces as output scalar reward/cost. If not specified, the step
         # function will return None for the reward/loss function
-        self.loss_func = loss_func
+        if loss_func is None:
+            self.loss_func = ExponentialReward()
+        else:
+            self.loss_func = loss_func
 
     def ros_init(self, init_ros_node=False):
         # init plant ros node
@@ -92,22 +155,52 @@ class ROSPlant(gym.Env):
         self.t = rospy.get_time()
 
     def init_obs_act_spaces(self):
-        rospy.loginfo(
-            '[%s] waiting for %s...' % (self.name,
-                                        ROSPlant.command_dims_srv_name))
-        rospy.wait_for_service(ROSPlant.command_dims_srv_name)
-        cdims = rospy.ServiceProxy(ROSPlant.command_dims_srv_name, T2VInfo)
-        rospy.loginfo(
-            '[%s] waiting for %s...' % (self.name,
-                                        ROSPlant.state_dims_srv_name))
-        rospy.wait_for_service(ROSPlant.state_dims_srv_name)
-        sdims = rospy.ServiceProxy(ROSPlant.state_dims_srv_name, T2VInfo)
 
-        # TODO get min max ranges from config file or from service
-        o_lims = np.array([1e3 for i in range(sdims().value)])
-        self.observation_space = spaces.Box(-o_lims, o_lims)
-        a_lims = np.array([1e3 for i in range(cdims().value)])
-        self.action_space = spaces.Box(-a_lims, a_lims)
+        rospy.loginfo(
+            '[%s] waiting for %s...' % (self.name,
+                                        ROSPlant.state_units_srv_name))
+        rospy.wait_for_service(ROSPlant.state_units_srv_name)
+        self.state_units = rospy.ServiceProxy(ROSPlant.state_units_srv_name, EnvSpaceUnits)().units
+
+        rospy.loginfo(
+            '[%s] waiting for %s...' % (self.name,
+                                        ROSPlant.state_bounds_srv_name))
+        rospy.wait_for_service(ROSPlant.state_bounds_srv_name)
+        s_bounds = rospy.ServiceProxy(ROSPlant.state_bounds_srv_name, EnvSpaceBounds)
+
+        rospy.loginfo(
+            '[%s] waiting for %s...' % (self.name,
+                                        ROSPlant.command_bounds_srv_name))
+        rospy.wait_for_service(ROSPlant.command_bounds_srv_name)
+        c_bounds = rospy.ServiceProxy(ROSPlant.command_bounds_srv_name, EnvSpaceBounds)
+
+        o_lbound = []
+        o_ubound = []
+        for dim_bounds in s_bounds().bounds:
+            o_lbound.append(dim_bounds.LowBound)
+            o_ubound.append(dim_bounds.UpBound)
+        o_lbound = np.array(o_lbound)
+        o_ubound = np.array(o_ubound)
+
+        a_lbound = []
+        a_ubound = []
+        for dim_bounds in c_bounds().bounds:
+            a_lbound.append(dim_bounds.LowBound)
+            a_ubound.append(dim_bounds.UpBound)
+        a_lbound = np.array(a_lbound)
+        a_ubound = np.array(a_ubound)
+
+        self.observation_space = spaces.Box(o_lbound, o_ubound)
+        self.action_space = spaces.Box(a_lbound, a_ubound)
+
+    def target_state_callback(self, msg):
+        print("I shouldn't be here.")
+        try:
+            assert np.array(msg.target_state).shape == self.observation_space.shape
+            self.target_state = np.array(msg.target_state)
+        except AssertionError:
+            print('AssertionError: target_state does not match observation '
+                  'space dimension')
 
     def experience_callback(self, msg):
         # put incoming messages into experience queue
@@ -169,12 +262,18 @@ class ROSPlant(gym.Env):
         info['action'] = action
 
         # evaluate cost, if given
-        cost = None
+        # CHANGED: from cost = None to reward = 0.0
+        #          for compatibility with SAC codebase
+        #          Hence the default reward will be 0.0
+        reward = 0.0
         if self.loss_func is not None:
-            cost = self.loss_func(self.state[None, :])
+            reward = self.loss_func(
+                                    angles2vector(self.state, self.state_units),
+                                    angles2vector(self.target_state, self.state_units)
+                                    )
 
         # return output following the openai gym convention
-        return self.state, cost, False, info
+        return self.state, reward, False, info
 
     def _reset(self):
         '''

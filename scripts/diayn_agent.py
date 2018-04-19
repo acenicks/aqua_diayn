@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# license removed for brevity
 import rospy
 import numpy as np
 from aquacore.srv import SetGait
@@ -28,7 +27,7 @@ SHARED_PARAMS = {
     'tau': 0.01,
     'K': 4,
     'layer_size': 300,
-    'batch_size': 10,
+    'batch_size': 3,
     'max_pool_size': 1E6,
     'n_train_repeat': 1,
     'epoch_length': 25,
@@ -89,8 +88,7 @@ def get_variants(args):
 
 def run_experiment(variant):
     if variant['env_name'] == 'aqua':
-        # env = normalize(AquaEnv(variant['env_name']))
-        env = AquaEnv(variant['env_name'])
+        env = normalize(AquaEnv(variant['env_name']))
 
     obs_space = env.spec.observation_space
     assert isinstance(obs_space, spaces.Box)
@@ -207,11 +205,3 @@ if __name__ == '__main__':
     args = parse_args(rospy.myargv()[1:])
     variant_generator = get_variants(args)
     launch_experiments(variant_generator)
-
-    # while True:
-    #     amplitudes = np.random.uniform(low=-np.pi, high=np.pi, size=(6))
-    #     leg_offsets = np.random.uniform(low=-np.pi, high=np.pi, size=(6))
-    #     phase_offsets = np.random.uniform(low=-np.pi, high=np.pi, size=(6))
-    #
-    #     action = np.hstack((amplitudes, leg_offsets, phase_offsets))
-    #     state, cost, _, info = env.step(action)
