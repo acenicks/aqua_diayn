@@ -30,11 +30,11 @@ SHARED_PARAMS = {
     'batch_size': 3,
     'max_pool_size': 1E6,
     'n_train_repeat': 1,
-    'epoch_length': 25,
+    'epoch_length': 50,
     'snapshot_mode': 'gap',
     'snapshot_gap': 10,
     'sync_pkl': True,
-    'num_skills': 10,
+    'num_skills': [10, 20, 50],
     'scale_entropy': 0.1,
     'include_actions': False,
     'learn_p_z': False,
@@ -43,13 +43,14 @@ SHARED_PARAMS = {
     'best_skill_n_rollouts': 1
 }
 
-TAG_KEYS = ['seed']
+TAG_KEYS = ['seed', 'num_skills']
+
 
 ENV_PARAMS = {
     'aqua': {
         'prefix': 'aqua',
         'env_name': 'aqua',
-        'max_path_length': 25,
+        'max_path_length': 50,
         'n_epochs': 1000,
     }
 }
@@ -168,6 +169,7 @@ def launch_experiments(variant_generator):
         tag = '__'.join(['%s_%s' % (key, variant[key]) for key in TAG_KEYS])
         log_dir = os.path.join(args.log_dir, tag)
         print('Launching {} experiments.'.format(len(variants)))
+        print('Experiment Variant: {}'.format(tag))
         run_sac_experiment(
             run_experiment,
             mode=args.mode,
