@@ -1,6 +1,6 @@
 # Project
 # Authors
-- Andrew Holliday (260604560 | )
+- Andrew Holliday (260604560 | ahollid@cim.mcgill.ca)
 - Karim Koreitem (260460964 | karim.koreitem@mail.mcgill.ca)
 - Nikhil Kakodkar (260578689 | nikhil.kakodkar@mail.mcgill.ca)
 
@@ -58,9 +58,7 @@ cd PATH_TO_ROS_WS/src/aqua_diayn/sac
 conda env create -f environment_py2.yml
 ```
 
-2. Install missing dependencies (for both sac and ros) using pip by following the "missing_packages.txt".
-
-3. Setup your environment:
+2. Setup your environment:
 
 In your ~/.bashrc, define the following function (editing the paths as needed):
 
@@ -82,3 +80,4 @@ source $PROJECT_PATH/devel/setup.bash
 
 }
 ```
+3 Install missing dependencies (for both sac and ros) using pip by following the "missing_packages.txt" *AFTER SOURCING YOUR FRESH NEW ENVIRONMENT WITH THE COMMAND ABOVE*.
