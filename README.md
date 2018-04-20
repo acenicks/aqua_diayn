@@ -80,4 +80,14 @@ source $PROJECT_PATH/devel/setup.bash
 
 }
 ```
-3 Install missing dependencies (for both sac and ros) using pip by following the "missing_packages.txt" **AFTER SOURCING YOUR FRESH NEW ENVIRONMENT WITH THE COMMAND ABOVE**.
+3. In your terminal, source your updated bashrc:
+```
+source ~/.bashrc
+```
+
+4. Source the newly defined environment using our command defined above:
+```
+source-rlproject-ws
+```
+
+5. Install missing dependencies (for both sac and ros) using pip by following the "missing_packages.txt" **AFTER** sourcing the freshly defined environment (i.e after running step 4).
