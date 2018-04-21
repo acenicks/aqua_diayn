@@ -154,7 +154,7 @@ def run_experiment(variant):
         discount=variant['discount'],
         tau=variant['tau'],
         num_skills=variant['num_skills'],
-        save_full_state=False,
+        save_full_state=True,
         include_actions=variant['include_actions'],
         learn_p_z=variant['learn_p_z'],
         add_p_z=variant['add_p_z'],
