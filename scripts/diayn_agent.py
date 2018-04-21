@@ -27,7 +27,7 @@ SHARED_PARAMS = {
     'tau': 0.01,
     'K': 4,
     'layer_size': 300,
-    'batch_size': 3,
+    'batch_size': 128,
     'max_pool_size': 1E6,
     'n_train_repeat': 1,
     'epoch_length': 50,
