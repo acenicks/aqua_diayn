@@ -31,11 +31,11 @@ SHARED_PARAMS = {
     'max_pool_size': 1E6,
     'n_train_repeat': 1,
     'epoch_length': 25,
-    'snapshot_mode': 'gap',
+    'snapshot_mode': ['all'],
     'snapshot_gap': 10,
     'sync_pkl': True,
     'num_skills': 10,
-    'scale_entropy': [0.1, 0.3, 0.5, 0.7, 0.9],
+    'scale_entropy': [0.3, 0.5],
     'include_actions': False,
     'learn_p_z': False,
     'add_p_z': True,
@@ -43,7 +43,7 @@ SHARED_PARAMS = {
     'best_skill_n_rollouts': 1
 }
 
-TAG_KEYS = ['seed', 'scale_entropy']
+TAG_KEYS = ['seed', 'snapshot_mode', 'scale_entropy']
 
 
 ENV_PARAMS = {
@@ -51,7 +51,7 @@ ENV_PARAMS = {
         'prefix': 'aqua',
         'env_name': 'aqua',
         'max_path_length': 25,
-        'n_epochs': 100,
+        'n_epochs': 50,
     }
 }
 DEFAULT_ENV = 'aqua'
@@ -154,7 +154,7 @@ def run_experiment(variant):
         discount=variant['discount'],
         tau=variant['tau'],
         num_skills=variant['num_skills'],
-        save_full_state=False,
+        save_full_state=True,
         include_actions=variant['include_actions'],
         learn_p_z=variant['learn_p_z'],
         add_p_z=variant['add_p_z'],
