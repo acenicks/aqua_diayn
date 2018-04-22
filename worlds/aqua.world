@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="aqua_world">
+    <!-- <include>
+      <uri>model://ground_plane</uri>
+      <pose>0.0 0.0 -6.0 0 0 0</pose>
+    </include> -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <physics type="ode">
+       <gravity>0 0 -9.8066</gravity>
+       <max_step_size>0.001</max_step_size>
+       <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+  </world>
+</sdf>
