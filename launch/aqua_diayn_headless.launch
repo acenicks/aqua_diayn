@@ -4,7 +4,7 @@
   <arg name="topic_description" default="$(find aqua_diayn)/launch/topic_description/6flipper_topics.yml"/>
   <arg name="task_description" default="$(find aqua_diayn)/launch/task_description/bellyup.yml"/>
 
-    <include file="$(find aqua_gazebo)/launch/headless.launch"></include>
+    <include file="$(find aqua_diayn)/launch/headless.launch"></include>
 
     <include file="$(find aqua_diayn)/launch/basic.launch">
       <arg name="topic_description" value="$(arg topic_description)"/>

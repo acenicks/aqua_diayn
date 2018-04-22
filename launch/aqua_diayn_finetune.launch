@@ -6,7 +6,7 @@
   <arg name="task_description" default="$(find aqua_diayn)/launch/task_description/bellyup.yml"/>
   <!-- <arg name="task_name"/> -->
 
-  <include file="$(find aqua_gazebo)/launch/aqua.launch"></include>
+  <include file="$(find aqua_diayn)/launch/aqua.launch"></include>
 
   <include file="$(find aqua_diayn)/launch/basic.launch">
     <arg name="topic_description" value="$(arg topic_description)"/>
