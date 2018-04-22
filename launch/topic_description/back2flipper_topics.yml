@@ -28,3 +28,9 @@ experience_command_topics:
       units: ["radians", "radians", "radians", "radians"]
       bounds: [[-0.785, 0.785], [-0.785, 0.785], [-0.785, 0.785], [-0.785, 0.785]]
       default_values: { frequencies: 2.5 }
+
+preprocessing_operations: {
+    RollAngle: ['radians'],
+    PitchAngle: ['radians'],
+    YawAngle: ['radians']
+}
