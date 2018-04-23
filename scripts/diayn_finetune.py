@@ -48,7 +48,7 @@ ENV_PARAMS = {
         'prefix': 'aqua',
         'env_name': 'Aqua-v0',
         'max_path_length': 25,
-        'n_epochs': 1000,
+        'n_epochs': 650,
         'scale_reward': 1,
     },
 }
