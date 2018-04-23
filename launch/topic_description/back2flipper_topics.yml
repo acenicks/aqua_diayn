@@ -10,12 +10,12 @@ experience_state_topics:
       type: {package: aquacore, name: StateMsg}
       filter: ["RollAngle","PitchAngle","YawAngle", "Depth"]
       units: ["radians", "radians", "radians", "meters"]
-      bounds: [[-3.14, 3.14], [-3.14, 3.14], [-3.14, 3.14], [0.0, 6.0]]
+      bounds: [[-3.14, 3.14], [-3.14, 3.14], [-3.14, 3.14], [0.0, 20.0]]
     - topic_name: /aqua/imu
       type: {package: sensor_msgs, name: Imu}
       filter: ["angular_velocity.x","angular_velocity.y","angular_velocity.z"]
       units: ["radians_per_seconds", "radians_per_seconds", "radians_per_seconds"]
-      bounds: [[-3.14, 3.14], [-3.14, 3.14], [-3.14, 3.14]]
+      bounds: [[-6.28, 6.28], [-6.28, 6.28], [-6.28, 6.28]]
 
 # experience_command_topics corresponds to the topics we want to publish when
 # stepping the policy computed with PILCO
@@ -26,7 +26,7 @@ experience_command_topics:
       type: {package: aquacore, name: PeriodicLegCommand}
       filter: ["amplitudes[2]","amplitudes[5]","leg_offsets[2]","leg_offsets[5]"]
       units: ["radians", "radians", "radians", "radians"]
-      bounds: [[-0.785, 0.785], [-0.785, 0.785], [-0.785, 0.785], [-0.785, 0.785]]
+      bounds: [[0.0, 0.785], [0.0, 0.785], [-1.57, 1.57], [-1.57, 1.57]]
       default_values: { frequencies: 2.5 }
 
 preprocessing_operations: {
