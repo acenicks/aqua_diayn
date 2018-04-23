@@ -10,7 +10,7 @@ experience_state_topics:
       type: {package: aquacore, name: StateMsg}
       filter: ["RollAngle","PitchAngle","YawAngle", "Depth"]
       units: ["radians", "radians", "radians", "meters"]
-      bounds: [[-3.14, 3.14], [-3.14, 3.14], [-3.14, 3.14], [0.0, 6.0]]
+      bounds: [[-3.14, 3.14], [-3.14, 3.14], [-3.14, 3.14], [0.0, 20.0]]
     - topic_name: /aqua/imu
       type: {package: sensor_msgs, name: Imu}
       filter: ["angular_velocity.x","angular_velocity.y","angular_velocity.z"]

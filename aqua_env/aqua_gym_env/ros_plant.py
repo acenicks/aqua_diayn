@@ -15,6 +15,7 @@ from aqua_diayn.msg import TargetState
 
 import csv
 import os
+import json
 
 
 class ExponentialReward():
@@ -62,33 +63,37 @@ def angles2vector(state, units):
     return aug_state
 
 class CSVLogger():
-    def __init__(self, filepath, fieldnames):
-        self.filepath = filepath
-        self.fieldnames = fieldnames
-        self.wrote_header = False
+    def __init__(self):#, filepath, fieldnames):
+        # self.filepath = filepath
+        # self.fieldnames = fieldnames
+        # self.wrote_header = False
+        pass
 
     def dump(self, data):
-        if not self.wrote_header:
-            with open(self.filepath, 'wb') as csvfile:
-                self.exp_keys = self.expand_fields(data)
-                self.exp_fields = reduce(lambda x, y: x + y,
-                                         self.exp_keys.values())
-                writer = csv.DictWriter(csvfile, fieldnames=self.exp_fields)
-                writer.writeheader()
-                self.wrote_header = True
+        # if not self.wrote_header:
+        #     with open(self.filepath, 'wb') as csvfile:
+        #         self.exp_keys = self.expand_fields(data)
+        #         self.exp_fields = reduce(lambda x, y: x + y,
+        #                                  self.exp_keys.values())
+        #         writer = csv.DictWriter(csvfile, fieldnames=self.exp_fields)
+        #         writer.writeheader()
+        #         self.wrote_header = True
 
-        with open(self.filepath, 'ab') as csvfile:
-            expanded_data = {}
-            for key, fields in self.exp_keys.iteritems():
-                key_data = data[key]
-                try:
-                    for field, val in zip(fields, key_data):
-                        expanded_data[field] = val
-                except TypeError:
-                    expanded_data[key] = key_data
+        # with open(self.filepath, 'ab') as csvfile:
+        self.exp_keys = self.expand_fields(data)
+        expanded_data = {}
+        for key, fields in self.exp_keys.iteritems():
+            key_data = data[key]
+            try:
+                for field, val in zip(fields, key_data):
+                    expanded_data[field] = val
+            except TypeError:
+                expanded_data[key] = key_data
 
-            writer = csv.DictWriter(csvfile, fieldnames=self.exp_fields)
-            writer.writerow(expanded_data)
+        log_str = json.dumps(expanded_data)
+        rospy.logdebug(log_str)
+        # writer = csv.DictWriter(csvfile, fieldnames=self.exp_fields)
+        # writer.writerow(expanded_data)
             # outlist = [str(kk) + ': ' + str(vv) for kk, vv in data.iteritems()]
             # outstr = ', '.join(outlist) + '\n'
             # logfile.write(outstr)
@@ -105,11 +110,12 @@ class CSVLogger():
         return expanded_keys
 
     def log_reset(self):
-        if self.wrote_header:
-            with open(self.filepath, 'ab') as csvfile:
-                writer = csv.DictWriter(csvfile, fieldnames=self.exp_fields)
-                row = {kk: 'RESET' for kk in self.exp_fields}
-                writer.writerow(row)
+        # if self.wrote_header:
+            # with open(self.filepath, 'ab') as csvfile:
+                # writer = csv.DictWriter(csvfile, fieldnames=self.exp_fields)
+                # row = {kk: 'RESET' for kk in self.exp_fields}
+                # writer.writerow(row)
+        rospy.logdebug('RESET')
 
 
 class ROSPlant(gym.Env):
@@ -168,14 +174,14 @@ class ROSPlant(gym.Env):
         self.t, self.state, self.cmd = self.wait_for_state(self.dt)
         rospy.loginfo('[%s] Ready.' % (self.name))
 
-
-        logfile_path = '/localdata/nikhil/data/comp767project_diayn/diversity_learning/rosplant_log.csv'
-        log_dict = {'curr_state': None,
-                    'action': None,
-                    'reward': None,
-                    'next_state': None
-                    }
-        self.logger = CSVLogger(logfile_path, log_dict.keys())
+        #
+        # logfile_path = '/localdata/nikhil/data/comp767project_diayn/diversity_learning/rosplant_log.csv'
+        # log_dict = {'curr_state': None,
+        #             'action': None,
+        #             'reward': None,
+        #             'next_state': None
+        #             }
+        self.logger = CSVLogger()
 
     def init_params(self, state0_dist=None, loss_func=None, dt=0.5,
                     noise_dist=None, angle_dims=[], name='ROSPlant',
@@ -352,11 +358,6 @@ class ROSPlant(gym.Env):
         self.t, self.state, cmd = self.wait_for_state(dt=0.1*self.dt)
 
         self.logger.log_reset()
-        # self.logger.dump({'curr_state': [],
-        #                   'action': [],
-        #                   'reward': [],
-        #                   'next_state': self.state
-        #                   })
 
         return self.state
 

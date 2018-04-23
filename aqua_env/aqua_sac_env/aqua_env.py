@@ -69,7 +69,7 @@ class AquaEnv(Env, Serializable):
                 log_dir = os.path.join(logger.get_snapshot_dir(), "gym_log")
         Serializable.quick_init(self, locals())
 
-        rospy.init_node('diayn_env_node', anonymous=True)
+        rospy.init_node('diayn_env_node', anonymous=True, log_level=rospy.DEBUG)
 
         env = gym.envs.make('Aqua-v0')
         # HACK: Gets rid of the TimeLimit wrapper that sets 'done = True' when
