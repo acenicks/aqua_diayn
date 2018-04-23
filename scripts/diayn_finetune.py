@@ -35,7 +35,7 @@ SHARED_PARAMS = {
     'max_pool_size': 1E6,
     'n_train_repeat': 1,
     'epoch_length': 25,
-    'snapshot_mode': 'gap',
+    'snapshot_mode': 'all',
     'snapshot_gap': 10,
     'sync_pkl': True,
     'use_pretrained_values': False, # Whether to use qf and vf from pretraining
@@ -43,18 +43,13 @@ SHARED_PARAMS = {
 
 TAG_KEYS = ['lr', 'use_pretrained_values']
 
-def reward_func(state):
-
-    return 2
-
 ENV_PARAMS = {
     'aqua': {
         'prefix': 'aqua',
         'env_name': 'Aqua-v0',
         'max_path_length': 25,
         'n_epochs': 1000,
-        'scale_reward': 100,
-        # 'loss_func': reward_func,
+        'scale_reward': 1,
     },
 }
 DEFAULT_ENV = 'aqua'
@@ -70,7 +65,6 @@ def parse_args(rospy_args):
     parser.add_argument('--mode', type=str, default='local')
     parser.add_argument('--log_dir', type=str, default=None)
     parser.add_argument('--snapshot', type=str, default=None)
-    # parser.add_argument('--task', type=str, default=None)
     args = parser.parse_args(rospy_args)
 
     return args
@@ -112,8 +106,6 @@ def run_experiment(variant):
         data = joblib.load(variant['snapshot_filename'])
         policy = data['policy']
         env = data['env']
-        # env.loss_func = variant['loss_func']
-        # print(env.loss_func)
 
         num_skills = data['policy'].observation_space.flat_dim - data['env'].spec.observation_space.flat_dim
         best_z = get_best_skill(policy, env, num_skills, variant['max_path_length'])

@@ -40,7 +40,7 @@ class ExponentialReward():
 
             err = curr_state - target_state
             reward = np.matmul(np.matmul(err.T, Q), err)
-            reward = np.exp(self.scale_factor * reward)
+            reward = np.exp(self.scale_factor * reward) - 1
 
         return reward
 
