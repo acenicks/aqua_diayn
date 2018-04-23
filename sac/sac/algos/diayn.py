@@ -461,6 +461,11 @@ class DIAYN(SAC):
 
 
                 self._evaluate(epoch)
+                observation = env.reset()  # HACK: Since Both self.env and
+                                           # self._eval_env are interfaced
+                                           # with the same simulator. But this
+                                           # may create problems when ephoc_len
+                                           # is not equal to max_path_len.
 
                 params = self.get_snapshot(epoch)
                 logger.save_itr_params(epoch, params)
