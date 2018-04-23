@@ -16,6 +16,7 @@ import numpy as np
 import os
 import scipy.stats
 import tensorflow as tf
+import rospy
 
 
 EPS = 1E-6
@@ -292,11 +293,11 @@ class DIAYN(SAC):
         return feed_dict
 
     def _get_best_single_option_policy(self):
-        print("Running: _get_best_single_option_policy")
+        rospy.loginfo("Running: _get_best_single_option_policy")
         best_returns = float('-inf')
         best_z = None
         for z in range(self._num_skills):
-            print("_get_best_single_option_policy skill #: " + str(z))
+            rospy.loginfo("_get_best_single_option_policy skill #: " + str(z))
             fixed_z_policy = FixedOptionPolicy(self._policy, self._num_skills, z)
             paths = rollouts(self._eval_env, fixed_z_policy,
                              self._max_path_length, self._best_skill_n_rollouts,
@@ -333,7 +334,7 @@ class DIAYN(SAC):
         :return: None
         """
 
-        print("Running _evaluate")
+        rospy.loginfo("Running _evaluate")
         if self._eval_n_episodes < 1:
             return
 
@@ -398,7 +399,7 @@ class DIAYN(SAC):
 
                 for t in range(self._epoch_length):
                     iteration = t + epoch * self._epoch_length
-                    print("Epoch #: " + str(epoch) + ", Iteration #: " + str(iteration))
+                    rospy.loginfo("Epoch #: " + str(epoch) + ", Iteration #: " + str(iteration))
 
                     action, _ = policy.get_action(aug_obs)
 
@@ -451,12 +452,12 @@ class DIAYN(SAC):
                     gt.stamp('train')
 
                 if self._learn_p_z:
-                    print('learning p(z)')
+                    rospy.loginfo('learning p(z)')
                     for z in range(self._num_skills):
                         if log_p_z_list[z]:
-                            print('\t skill = %d, min=%.2f, max=%.2f, mean=%.2f, len=%d' % (z, np.min(log_p_z_list[z]), np.max(log_p_z_list[z]), np.mean(log_p_z_list[z]), len(log_p_z_list[z])))
+                            rospy.loginfo('\t skill = %d, min=%.2f, max=%.2f, mean=%.2f, len=%d' % (z, np.min(log_p_z_list[z]), np.max(log_p_z_list[z]), np.mean(log_p_z_list[z]), len(log_p_z_list[z])))
                     log_p_z = [np.mean(log_p_z) if log_p_z else np.log(1.0 / self._num_skills) for log_p_z in log_p_z_list]
-                    print('log_p_z: %s' % log_p_z)
+                    rospy.loginfo('log_p_z: %s' % log_p_z)
                     self._p_z = utils._softmax(log_p_z)
 
 

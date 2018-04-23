@@ -24,7 +24,7 @@ class ExponentialReward():
         self.scale_factor = - 1./(2. * self.c)
 
     def __call__(self, curr_state, target_state=None):
-        reward = 0.
+        reward = -1.
 
         if target_state is not None:
 
@@ -37,6 +37,10 @@ class ExponentialReward():
             target_state.reshape(-1, 1)
 
             Q = np.eye(len(curr_state))
+            for ii, tt in enumerate(target_state):
+                if np.isnan(tt):
+                    Q[ii, ii] = 0.0
+                    target_state[ii] = 0.0  # NOTE: This value is irrelevant.
 
             err = curr_state - target_state
             reward = np.matmul(np.matmul(err.T, Q), err)

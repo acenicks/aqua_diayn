@@ -24,9 +24,9 @@ experience_state_topics:
 experience_command_topics:
     - topic_name: /aqua/periodic_leg_command
       type: {package: aquacore, name: PeriodicLegCommand}
-      filter: ["amplitudes","leg_offsets", "phase_offsets"]
-      units: ["radians", "radians", "radians"]
-      bounds: [[0.0, 0.785], [-1.57, 1.57], [-3.14, 3.14]]
+      filter: ["amplitudes[0]","amplitudes[2]","amplitudes[3]","amplitudes[5]","leg_offsets[0]","leg_offsets[2]","leg_offsets[3]","leg_offsets[5]"]
+      units: ["radians", "radians", "radians", "radians", "radians", "radians", "radians", "radians"]
+      bounds: [[0.0, 0.785], [0.0, 0.785], [0.0, 0.785], [0.0, 0.785], [-1.57, 1.57], [-1.57, 1.57], [-1.57, 1.57], [-1.57, 1.57]]
       default_values: { frequencies: 2.5 }
 
 preprocessing_operations: {

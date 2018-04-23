@@ -1,3 +1,0 @@
-task_description:
-    task_name: 'depth_change_1m'
-    target_state: [0.0, 0, 0, 2.0, 0.0, 0.0, 0.0]
