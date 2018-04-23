@@ -168,8 +168,8 @@ def launch_experiments(variant_generator):
     for i, variant in enumerate(variants):
         tag = '__'.join(['%s_%s' % (key, variant[key]) for key in TAG_KEYS])
         log_dir = os.path.join(args.log_dir, tag)
-        print('Launching {} experiments.'.format(len(variants)))
-        print('Experiment Variant: {}'.format(tag))
+        rospy.loginfo('Launching {} experiments.'.format(len(variants)))
+        rospy.loginfo('Experiment Variant: {}'.format(tag))
         run_sac_experiment(
             run_experiment,
             mode=args.mode,
