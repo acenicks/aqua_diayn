@@ -3,6 +3,7 @@
 # import numpy as np
 
 import rospy
+import numpy as np
 from aqua_diayn.msg import TargetState
 
 # TODO: Add service for changing the target state dynamically
@@ -27,7 +28,13 @@ class TaskManager():
             target_state = TargetState()
             target_state.header.stamp = rospy.Time.now()
 
-            target_state.target_state = self.task_description['target_state']
+            target_state.target_state = []
+            # target_state = []
+            for tt in self.task_description['target_state']:
+                if tt == 'nan':
+                    target_state.target_state.append(np.nan)
+                else:
+                    target_state.target_state.append(float(tt))
 
             self.target_state_pub.publish(target_state)
             self.rate.sleep()
