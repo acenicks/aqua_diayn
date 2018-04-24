@@ -31,7 +31,7 @@ SHARED_PARAMS = {
     'discount': 0.99,
     'tau': 0.01,
     'layer_size': 300,
-    'batch_size': 16,
+    'batch_size': 128,
     'max_pool_size': 1E6,
     'n_train_repeat': 1,
     'epoch_length': 25,
@@ -48,7 +48,7 @@ ENV_PARAMS = {
         'prefix': 'aqua',
         'env_name': 'Aqua-v0',
         'max_path_length': 25,
-        'n_epochs': 650,
+        'n_epochs': 700,
         'scale_reward': 1,
     },
 }
