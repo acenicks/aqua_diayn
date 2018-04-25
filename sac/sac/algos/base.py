@@ -10,6 +10,8 @@ from ..core.serializable import deep_clone
 from ..misc import tf_utils
 from ..misc.sampler import rollouts
 
+import rospy
+
 
 class RLAlgorithm(Algorithm):
     """Abstract RLAlgorithm.
@@ -88,6 +90,7 @@ class RLAlgorithm(Algorithm):
 
                 for t in range(self._epoch_length):
                     iteration = t + epoch * self._epoch_length
+                    rospy.loginfo("Epoch #: " + str(epoch) + ", Iteration #: " + str(iteration))
 
                     action, _ = policy.get_action(observation)
                     next_ob, reward, terminal, info = env.step(action)
@@ -156,6 +159,7 @@ class RLAlgorithm(Algorithm):
         :return: None
         """
 
+        rospy.loginfo("Running _evaluate")
         if self._eval_n_episodes < 1:
             return
 
