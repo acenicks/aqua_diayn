@@ -26,7 +26,7 @@ SHARED_PARAMS = {
     'discount': 0.99,
     'tau': 0.01,
     'K': 4,
-    'layer_size': 300,
+    'layer_size': 200,
     'batch_size': 128,
     'max_pool_size': 1E6,
     'n_train_repeat': 1,
@@ -34,7 +34,7 @@ SHARED_PARAMS = {
     'snapshot_mode': ['all'],
     'snapshot_gap': 10,
     'sync_pkl': True,
-    'num_skills': [10, 20, 50],
+    'num_skills': 20,
     'scale_entropy': 0.1,
     'include_actions': False,
     'learn_p_z': False,
@@ -43,7 +43,7 @@ SHARED_PARAMS = {
     'best_skill_n_rollouts': 1
 }
 
-TAG_KEYS = ['seed', 'snapshot_mode', 'num_skills']
+TAG_KEYS = ['num_skills', 'layer_size', 'n_epochs']
 
 
 ENV_PARAMS = {
