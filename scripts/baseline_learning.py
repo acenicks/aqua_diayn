@@ -33,29 +33,29 @@ import tensorflow as tf
 
 SHARED_PARAMS = {
     'seed': 1,
-    'lr': 3E-4,
+    'lr': [7E-5, 1E-4, 3E-4, 7E-4, 3E-3],
     'discount': 0.99,
     'tau': 0.01,
     'K': 4,
-    'layer_size': 300,
-    'batch_size': 128,
+    'layer_size': 200,
+    'batch_size': 25,
     'max_pool_size': 1E6,
     'n_train_repeat': 1,
-    'epoch_length': 1000,
+    'epoch_length': 50,
     'snapshot_mode': 'all',
     'snapshot_gap': 10,
     'sync_pkl': True,
-    'use_pretrained_values': False, # Whether to use qf and vf from pretraining
+    'use_pretrained_values': False,  # Whether to use qf and vf from pretraining
 }
 
-TAG_KEYS = ['lr']
+TAG_KEYS = ['lr', 'layer_size', 'epoch_length', 'max_path_length']
 
 ENV_PARAMS = {
     'aqua': {
         'prefix': 'aqua',
         'env_name': 'Aqua-v0',
-        'max_path_length': 25,
-        'n_epochs': 700,
+        'max_path_length': 50,
+        'n_epochs': 200,
         'scale_reward': 1,
     },
 }
@@ -118,23 +118,24 @@ def run_experiment(variant):
         )
 
         M = variant['layer_size']
+        network_arch = [M, M, M, M]
 
         qf = NNQFunction(
             env_spec=aug_env_spec,
-            hidden_layer_sizes=[M, M],
+            hidden_layer_sizes=network_arch,
             var_scope='qf-baseline',
         )
 
         vf = NNVFunction(
             env_spec=aug_env_spec,
-            hidden_layer_sizes=[M, M],
+            hidden_layer_sizes=network_arch,
             var_scope='vf-baseline',
         )
 
         policy = GMMPolicy(
             env_spec=aug_env_spec,
             K=variant['K'],
-            hidden_layer_sizes=[M, M],
+            hidden_layer_sizes=network_arch,
             qf=qf,
             reg=0.001,
         )

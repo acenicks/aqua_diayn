@@ -19,7 +19,7 @@ import json
 
 
 class ExponentialReward():
-    def __init__(self, c=1.0):
+    def __init__(self, c=10.0):
         self.c = c
         self.scale_factor = - 1./(2. * self.c)
 

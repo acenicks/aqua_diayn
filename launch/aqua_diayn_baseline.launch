@@ -1,7 +1,7 @@
 <launch>
   <arg name="project_path" value="$(env PROJECT_PATH)"/>
   <arg name="log_dir" default="$(arg project_path)/data" />
-  <arg name="topic_description" default="$(find aqua_diayn)/launch/topic_description/6flipper_topics.yml"/>
+  <arg name="topic_description" default="$(find aqua_diayn)/launch/topic_description/back2flipper_topics.yml"/>
   <arg name="task_description" default="$(find aqua_diayn)/launch/task_description/corkscrew.yml"/>
   <!-- <arg name="task_name"/> -->
 
