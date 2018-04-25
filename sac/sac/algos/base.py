@@ -124,6 +124,7 @@ class RLAlgorithm(Algorithm):
                     gt.stamp('train')
 
                 self._evaluate(epoch)
+                env.reset()
 
                 params = self.get_snapshot(epoch)
                 logger.save_itr_params(epoch, params)
