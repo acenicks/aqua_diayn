@@ -36,18 +36,19 @@ SHARED_PARAMS = {
     'lr': 3E-4,
     'discount': 0.99,
     'tau': 0.01,
+    'K': 4,
     'layer_size': 300,
     'batch_size': 128,
     'max_pool_size': 1E6,
     'n_train_repeat': 1,
-    'epoch_length': 25,
+    'epoch_length': 1000,
     'snapshot_mode': 'all',
     'snapshot_gap': 10,
     'sync_pkl': True,
     'use_pretrained_values': False, # Whether to use qf and vf from pretraining
 }
 
-TAG_KEYS = ['lr', 'use_pretrained_values']
+TAG_KEYS = ['lr']
 
 ENV_PARAMS = {
     'aqua': {
@@ -70,7 +71,6 @@ def parse_args(rospy_args):
     parser.add_argument('--exp_name', type=str, default=timestamp())
     parser.add_argument('--mode', type=str, default='local')
     parser.add_argument('--log_dir', type=str, default=None)
-    parser.add_argument('--snapshot', type=str, default=None)
     args = parser.parse_args(rospy_args)
 
     return args
@@ -86,7 +86,6 @@ def get_variants(args):
             vg.add(key, val)
         else:
             vg.add(key, [val])
-    vg.add('snapshot_filename', [args.snapshot])
     return vg
 
 def run_experiment(variant):
@@ -94,12 +93,13 @@ def run_experiment(variant):
     with tf.Session() as sess:
 
         env = normalize(AquaEnv(variant['env_name']))
-        obs_space = env.spec.observation_space
-
-        low = np.hstack([obs_space.low, np.full(variant['num_skills'], 0)])
-        high = np.hstack([obs_space.high, np.full(variant['num_skills'], 1)])
-        aug_obs_space = spaces.Box(low=low, high=high)
-        aug_env_spec = EnvSpec(aug_obs_space, env.spec.action_space)
+        # obs_space = env.spec.observation_space
+        #
+        # low = np.hstack([obs_space.low, np.full(variant['num_skills'], 0)])
+        # high = np.hstack([obs_space.high, np.full(variant['num_skills'], 1)])
+        # aug_obs_space = spaces.Box(low=low, high=high)
+        # aug_env_spec = EnvSpec(aug_obs_space, env.spec.action_space)
+        aug_env_spec = env.spec
         pool = SimpleReplayBuffer(
             env_spec=aug_env_spec,
             max_replay_buffer_size=variant['max_pool_size'],
@@ -122,13 +122,13 @@ def run_experiment(variant):
         qf = NNQFunction(
             env_spec=aug_env_spec,
             hidden_layer_sizes=[M, M],
-            var_scope='qf-finetune',
+            var_scope='qf-baseline',
         )
 
         vf = NNVFunction(
             env_spec=aug_env_spec,
             hidden_layer_sizes=[M, M],
-            var_scope='vf-finetune',
+            var_scope='vf-baseline',
         )
 
         policy = GMMPolicy(
@@ -160,13 +160,9 @@ def launch_experiments(variant_generator):
     variants = variant_generator.variants()
 
     for i, variant in enumerate(variants):
-        tag = 'finetune__'
-        print(variant['snapshot_filename'])
-        tag += variant['snapshot_filename'].split('/')[-2]
-        tag += '____'
+        tag = 'baseline__'
         tag += '__'.join(['%s_%s' % (key, variant[key]) for key in TAG_KEYS])
         log_dir = os.path.join(args.log_dir, tag)
-        variant['video_dir'] = os.path.join(log_dir, 'videos')
         print('Launching {} experiments.'.format(len(variants)))
         run_sac_experiment(
             run_experiment,
@@ -184,6 +180,7 @@ def launch_experiments(variant_generator):
             sync_s3_pkl=variant['sync_pkl'],
         )
 
+
 def set_gait_flex_sine():
     rospy.wait_for_service('/aqua/set_gait')
     try:
@@ -192,6 +189,7 @@ def set_gait_flex_sine():
         return resp
     except rospy.ServiceException, e:
         print "Service call failed: %s" % e
+
 
 if __name__ == '__main__':
     set_gait_flex_sine()
