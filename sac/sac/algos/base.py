@@ -28,6 +28,7 @@ class RLAlgorithm(Algorithm):
             epoch_length=1000,
             min_pool_size=10000,
             max_path_length=1000,
+            eval_interval = 1,
             eval_n_episodes=10,
             eval_deterministic=True,
             eval_render=False,
@@ -45,6 +46,7 @@ class RLAlgorithm(Algorithm):
             max_path_length (`int`): Number of timesteps before resetting
                 environment and policy, and the number of paths used for
                 evaluation rollout.
+            eval_interval (`int`): How often to evaluate the policy
             eval_n_episodes (`int`): Number of rollouts to evaluate.
             eval_deterministic (`int`): Whether or not to run the policy in
                 deterministic mode when evaluating policy.
@@ -58,6 +60,7 @@ class RLAlgorithm(Algorithm):
         self._min_pool_size = min_pool_size
         self._max_path_length = max_path_length
 
+        self._eval_interval = eval_interval
         self._eval_n_episodes = eval_n_episodes
         self._eval_deterministic = eval_deterministic
         self._eval_render = eval_render
@@ -126,29 +129,30 @@ class RLAlgorithm(Algorithm):
 
                     gt.stamp('train')
 
-                self._evaluate(epoch)
-                env.reset()
+                if epoch % self._eval_interval == 0 :
+                    self._evaluate(epoch)
+                    env.reset()
 
-                params = self.get_snapshot(epoch)
-                logger.save_itr_params(epoch, params)
-                times_itrs = gt.get_times().stamps.itrs
+                    params = self.get_snapshot(epoch)
+                    logger.save_itr_params(epoch, params)
+                    times_itrs = gt.get_times().stamps.itrs
 
-                eval_time = times_itrs['eval'][-1] if epoch > 1 else 0
-                total_time = gt.get_times().total
-                logger.record_tabular('time-train', times_itrs['train'][-1])
-                logger.record_tabular('time-eval', eval_time)
-                logger.record_tabular('time-sample', times_itrs['sample'][-1])
-                logger.record_tabular('time-total', total_time)
-                logger.record_tabular('epoch', epoch)
-                logger.record_tabular('episodes', n_episodes)
-                logger.record_tabular('max-path-return', max_path_return)
-                logger.record_tabular('last-path-return', last_path_return)
-                logger.record_tabular('pool-size', self._pool.size)
+                    eval_time = times_itrs['eval'][-1] if epoch > 1 else 0
+                    total_time = gt.get_times().total
+                    logger.record_tabular('time-train', times_itrs['train'][-1])
+                    logger.record_tabular('time-eval', eval_time)
+                    logger.record_tabular('time-sample', times_itrs['sample'][-1])
+                    logger.record_tabular('time-total', total_time)
+                    logger.record_tabular('epoch', epoch)
+                    logger.record_tabular('episodes', n_episodes)
+                    logger.record_tabular('max-path-return', max_path_return)
+                    logger.record_tabular('last-path-return', last_path_return)
+                    logger.record_tabular('pool-size', self._pool.size)
 
-                logger.dump_tabular(with_prefix=False)
-                logger.pop_prefix()
+                    logger.dump_tabular(with_prefix=False)
+                    logger.pop_prefix()
 
-                gt.stamp('eval')
+                    gt.stamp('eval')
 
             env.terminate()
 
