@@ -33,29 +33,29 @@ import tensorflow as tf
 
 SHARED_PARAMS = {
     'seed': 1,
-    'lr': [7E-5, 1E-4, 3E-4, 7E-4, 3E-3],
+    'lr': 3E-4,
     'discount': 0.99,
     'tau': 0.01,
     'K': 4,
     'layer_size': 200,
-    'batch_size': 25,
+    'batch_size': 128,
     'max_pool_size': 1E6,
     'n_train_repeat': 1,
-    'epoch_length': 50,
+    'epoch_length': 25,
     'snapshot_mode': 'all',
     'snapshot_gap': 10,
     'sync_pkl': True,
     'use_pretrained_values': False,  # Whether to use qf and vf from pretraining
 }
 
-TAG_KEYS = ['lr', 'layer_size', 'epoch_length', 'max_path_length']
+TAG_KEYS = ['n_epochs', 'layer_size']
 
 ENV_PARAMS = {
     'aqua': {
         'prefix': 'aqua',
         'env_name': 'Aqua-v0',
-        'max_path_length': 50,
-        'n_epochs': 200,
+        'max_path_length': 25,
+        'n_epochs': 700,
         'scale_reward': 1,
     },
 }
