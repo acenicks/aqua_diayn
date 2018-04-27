@@ -113,7 +113,7 @@ def run_experiment(variant):
             batch_size=variant['batch_size'],
             n_train_repeat=variant['n_train_repeat'],
             eval_render=False,
-            eval_n_episodes=1,
+            eval_n_episodes=10,
             eval_deterministic=True,
         )
 
