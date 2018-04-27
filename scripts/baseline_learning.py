@@ -107,13 +107,14 @@ def run_experiment(variant):
 
         base_kwargs = dict(
             min_pool_size=variant['max_path_length'],
+            min_pool_size=variant['batch_size'], #variant['max_path_length'],
             epoch_length=variant['epoch_length'],
             n_epochs=variant['n_epochs'],
             max_path_length=variant['max_path_length'],
             batch_size=variant['batch_size'],
             n_train_repeat=variant['n_train_repeat'],
             eval_render=False,
-            eval_n_episodes=10,
+            eval_n_episodes=1,
             eval_deterministic=True,
         )
 
