@@ -4,16 +4,19 @@
 - Karim Koreitem (260460964 | karim.koreitem@mail.mcgill.ca)
 - Nikhil Kakodkar (260578689 | nikhil.kakodkar@mail.mcgill.ca)
 
-## Overview
-This project implements a deep reinforcement learning algorithm for discovering a set of useful skills in an unsupervised fashion. The algorithm is based on the paper Diversity is All You Need: Learning Diverse Skills without a Reward Function.
+# NOTE:
+This project is built on the source code provided by other researchers, namely:
+1. Eysenbach, Benjamin, et al. "Diversity is All You Need: Learning Skills without a Reward Function." arXiv preprint arXiv:1802.06070 (2018).
 
-**What:**
-Learning 'diverse' skills. Diverse in the sense that the skills are optimized to have high entropy in the state space. So better exploration.
+  Haarnoja, Tuomas, et al. "Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor." arXiv preprint arXiv:1801.01290 (2018).
 
-**Why:**
-1. Use these skills as pretraining mechnism for further learning particular tasks.
-2. May be use these skills as a curriculum for achieving complex tasks
-3. We also use this method to learn sets of skills over various actuator failure modes
+  https://github.com/haarnoja/sac.git
+
+2. Meger, David, et al. "Learning legged swimming gaits from experience." Robotics and Automation (ICRA), 2015 IEEE International Conference on. IEEE, 2015. (This codebase is currently private and internal to the MRL lab at McGill University).
+
+3. Yan Duan, Xi Chen, Rein Houthooft, John Schulman, Pieter Abbeel. "Benchmarking Deep Reinforcement Learning for Continuous Control". Proceedings of the 33rd International Conference on Machine Learning (ICML), 2016.
+
+  https://github.com/rll/rllab.git
 
 ## Project file structure
 The project file structure should look like this:
@@ -34,8 +37,8 @@ ros_ws/
 |   |   ├── notebooks
 |   |   ├── package.xml
 |   |   ├── README.md
-|   |   ├── rllab
-|   |   ├── sac
+|   |   ├── rllab           <-- (https://github.com/rll/rllab.git)
+|   |   ├── sac             <-- (https://github.com/haarnoja/sac.git)
 |   |   ├── scripts
 |   |   └── src
 |   |

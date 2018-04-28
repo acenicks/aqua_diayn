@@ -13,7 +13,6 @@ rllab/MUJOCO_LOG.TXT
 rllab/vendor/mujoco
 *.project
 *.pydevproject
-*.pdf
 *.env
 rllab/rllab/config_personal.py
 *.swp
