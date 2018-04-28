@@ -7,15 +7,16 @@
 # NOTE:
 This project is built on the source code provided by other researchers, namely:
 1. Eysenbach, Benjamin, et al. "Diversity is All You Need: Learning Skills without a Reward Function." arXiv preprint arXiv:1802.06070 (2018).
-  Haarnoja, Tuomas, et al. "Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor." arXiv preprint arXiv:1801.01290 (2018).
+  
+   Haarnoja, Tuomas, et al. "Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor." arXiv preprint arXiv:1801.01290 (2018).
 
-  https://github.com/haarnoja/sac.git
+   https://github.com/haarnoja/sac.git
 
 2. Meger, David, et al. "Learning legged swimming gaits from experience." Robotics and Automation (ICRA), 2015 IEEE International Conference on. IEEE, 2015. (This codebase is currently private and internal to the MRL lab at McGill University).
 
 3. Yan Duan, Xi Chen, Rein Houthooft, John Schulman, Pieter Abbeel. "Benchmarking Deep Reinforcement Learning for Continuous Control". Proceedings of the 33rd International Conference on Machine Learning (ICML), 2016.
 
-  https://github.com/rll/rllab.git
+   https://github.com/rll/rllab.git
 
 ## Project file structure
 The project file structure should look like this:
