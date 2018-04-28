@@ -7,7 +7,6 @@
 # NOTE:
 This project is built on the source code provided by other researchers, namely:
 1. Eysenbach, Benjamin, et al. "Diversity is All You Need: Learning Skills without a Reward Function." arXiv preprint arXiv:1802.06070 (2018).
-
   Haarnoja, Tuomas, et al. "Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor." arXiv preprint arXiv:1801.01290 (2018).
 
   https://github.com/haarnoja/sac.git
